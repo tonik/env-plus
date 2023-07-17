@@ -46,6 +46,9 @@ jobs:
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install
-      - run: pnpm publish --no-git-checks --access public
+
+      - run: pnpm build
+
+      - run: pnpm publish --no-git-checks --access public --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
