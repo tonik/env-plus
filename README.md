@@ -111,3 +111,7 @@ if (env.GOOGLE_AUTH_ENABLED) {
   env.GOOGLE_CLIENT_SECRET; // type string (undefined dropped)
 }
 ```
+
+## License
+
+Licensed under the [MIT license](https://github.com/tonik/env-plus/blob/main/LICENSE).
