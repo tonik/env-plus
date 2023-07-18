@@ -10,7 +10,10 @@
     "commitMessage": "chore: release ${version} [skip ci]",
     "requireCleanWorkingDir": false
   },
-  "hooks": {
-    "after:bump": "pnpm dlx auto-changelog -p"
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": "angular",
+      "infile": "CHANGELOG.md"
+    }
   }
 }

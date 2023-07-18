@@ -28,6 +28,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@release-it/conventional-changelog": "^7.0.0",
     "@types/node": "^20.4.2",
     "release-it": "^16.1.2",
     "tsup": "^7.1.0",
