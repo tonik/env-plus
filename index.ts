@@ -201,10 +201,12 @@ type EnvReturn<
 
 type RuntimeOptions<
   TPrefix extends string,
+  TShared extends Record<string, ZodType>,
   TClient extends Record<string, ZodType>,
   TServer extends Record<string, ZodType>
 > = {
   runtimeEnv: Record<
+    | keyof TShared
     | {
         [TKey in keyof TClient]: TKey extends `${TPrefix}${string}`
           ? TKey
@@ -349,7 +351,7 @@ type EnvOptions<
       Impossible<TransformOptions<never, never, never>> &
       Impossible<FeatureFlagsOptions<never, never, never, never, never>>)
 ) &
-  RuntimeOptions<TPrefix, TClient, TServer> &
+  RuntimeOptions<TPrefix, TShared, TClient, TServer> &
   CommonOptions<TShared>;
 
 export function createEnv<

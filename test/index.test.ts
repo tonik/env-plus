@@ -150,6 +150,26 @@ describe("createEnv", () => {
   });
 
   describe.skip("types", () => {
+    it("should fail when runtimeEnv doesn't contain shared keys", () => {
+      createEnv({
+        isServer: true,
+        clientPrefix: "PREFIX_" as const,
+        client: {
+          PREFIX_TEST: z.string(),
+        },
+        shared: {
+          SUT: z.string(),
+        },
+        server: {
+          TEST: z.string(),
+        },
+        // @ts-expect-error
+        runtimeEnv: {
+          PREFIX_TEST: "",
+        },
+      });
+    });
+
     it("Should fail when server env contain client prefixed env", () => {
       createEnv({
         isServer: true,
