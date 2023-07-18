@@ -1,0 +1,16 @@
+{
+  "github": {
+    "release": true
+  },
+  "npm": {
+    "publish": true
+  },
+  "git": {
+    "requireBranch": "main",
+    "commitMessage": "chore: release ${version} [skip ci]",
+    "requireCleanWorkingDir": false
+  },
+  "hooks": {
+    "after:bump": "pnpm dlx auto-changelog -p"
+  }
+}

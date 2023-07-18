@@ -12,7 +12,7 @@ Toolkit for managing type-safe environment variables with the feature flags buil
 ## Installation
 
 ```
-pnpm i @tonik/env-plus zod
+pnpm add @tonik/env-plus zod
 ```
 
 ## How to define env schema
