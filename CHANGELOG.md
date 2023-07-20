@@ -1,5 +1,12 @@
 
 
+## [0.1.6](https://github.com/tonik/env-plus/compare/0.1.5...0.1.6) (2023-07-20)
+
+
+### Bug Fixes
+
+* failing feature flag runtime checks ([5db3e78](https://github.com/tonik/env-plus/commit/5db3e786f01fb88ec1a9128e1f6c0f6d35c762a9))
+
 ## [0.1.5](https://github.com/tonik/env-plus/compare/0.1.4...0.1.5) (2023-07-20)
 
 

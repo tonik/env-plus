@@ -1,6 +1,6 @@
 {
   "name": "@tonik/env-plus",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Environment variables toolkit for node applications",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
