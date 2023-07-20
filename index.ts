@@ -206,17 +206,31 @@ type RuntimeOptions<
   TServer extends Record<string, ZodType>
 > = {
   runtimeEnv: Record<
-    | keyof TShared
-    | {
-        [TKey in keyof TClient]: TKey extends `${TPrefix}${string}`
-          ? TKey
-          : never;
-      }[keyof TClient]
-    | {
-        [TKey in keyof TServer]: TKey extends `${TPrefix}${string}`
-          ? never
-          : TKey;
-      }[keyof TServer],
+    TPrefix extends ""
+      ?
+          | {
+              [TKey in keyof TShared]: TKey extends string ? TKey : never;
+            }[keyof TShared]
+          | {
+              [TKey in keyof TClient]: TKey extends string ? TKey : never;
+            }[keyof TClient]
+          | {
+              [TKey in keyof TServer]: TKey extends string ? TKey : never;
+            }[keyof TServer]
+      :
+          | {
+              [TKey in keyof TShared]: TKey extends string ? TKey : never;
+            }[keyof TShared]
+          | {
+              [TKey in keyof TClient]: TKey extends `${TPrefix}${string}`
+                ? TKey
+                : never;
+            }[keyof TClient]
+          | {
+              [TKey in keyof TServer]: TKey extends `${TPrefix}${string}`
+                ? never
+                : TKey;
+            }[keyof TServer],
     string | boolean | number | undefined
   >;
 };

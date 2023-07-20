@@ -126,7 +126,7 @@ describe("createEnv", () => {
     ).toThrowError("Invalid feature flags");
   });
 
-  it("should pass flags if flag is set and env is provided", () => {
+  it("should pass flags if flag is set and env is provided without client", () => {
     const env = createEnv({
       isServer: true,
       server: {
@@ -134,19 +134,129 @@ describe("createEnv", () => {
           .enum(["true", "false"])
           .default("false")
           .transform((v) => v === "true"),
-        VALUE: z.string().optional(),
+        VALUE1: z.string().optional(),
+      },
+      shared: {
+        VALUE2: z.string().optional(),
       },
       runtimeEnv: {
         FLAG: "true",
-        VALUE: "TEST",
+        VALUE1: "TEST",
+        VALUE2: "TEST",
       },
       featureFlags: {
-        FLAG: { VALUE: true },
+        FLAG: { VALUE1: true, VALUE2: true },
       },
     });
 
     expect(env.FLAG).toBe(true);
-    expect(env.VALUE).toBe("TEST");
+    expect(env.VALUE1).toBe("TEST");
+    expect(env.VALUE2).toBe("TEST");
+  });
+
+  it("should pass with everything set and only default values on server", () => {
+    const env = createEnv({
+      isServer: true,
+      server: {
+        FLAG: z
+          .enum(["true", "false"])
+          .default("false")
+          .transform((v) => v === "true"),
+        VALUE1: z.string().optional(),
+      },
+      shared: {
+        VALUE2: z.string().optional(),
+      },
+      client: {
+        NEXT_PUBLIC_FLAG: z
+          .enum(["true", "false"])
+          .default("false")
+          .transform((v) => v === "true"),
+        NEXT_PUBLIC_VALUE1: z.string().optional(),
+      },
+      clientPrefix: "NEXT_PUBLIC_",
+      runtimeEnv: {
+        FLAG: undefined,
+        VALUE1: undefined,
+        VALUE2: undefined,
+        NEXT_PUBLIC_FLAG: undefined,
+        NEXT_PUBLIC_VALUE1: undefined,
+      },
+      featureFlags: {
+        FLAG: { VALUE1: true, VALUE2: true },
+        NEXT_PUBLIC_FLAG: {
+          NEXT_PUBLIC_VALUE1: true,
+        },
+      },
+    });
+
+    expect(env.FLAG).toBe(false);
+    expect(env.VALUE1).toBe(undefined);
+    expect(env.VALUE2).toBe(undefined);
+    expect(env.NEXT_PUBLIC_FLAG).toBe(false);
+    expect(env.NEXT_PUBLIC_VALUE1).toBe(undefined);
+  });
+
+  it("should pass with everything set and only default values on client", () => {
+    const env = createEnv({
+      isServer: false,
+      server: {
+        FLAG: z
+          .enum(["true", "false"])
+          .default("false")
+          .transform((v) => v === "true"),
+        VALUE1: z.string().optional(),
+      },
+      shared: {
+        VALUE2: z.string().optional(),
+      },
+      client: {
+        NEXT_PUBLIC_FLAG: z
+          .enum(["true", "false"])
+          .default("false")
+          .transform((v) => v === "true"),
+        NEXT_PUBLIC_VALUE1: z.string().optional(),
+      },
+      clientPrefix: "NEXT_PUBLIC_",
+      runtimeEnv: {
+        FLAG: undefined,
+        VALUE1: undefined,
+        VALUE2: undefined,
+        NEXT_PUBLIC_FLAG: undefined,
+        NEXT_PUBLIC_VALUE1: undefined,
+      },
+      featureFlags: {
+        FLAG: { VALUE1: true, VALUE2: true },
+        NEXT_PUBLIC_FLAG: {
+          NEXT_PUBLIC_VALUE1: true,
+        },
+      },
+    });
+
+    expect(env.NEXT_PUBLIC_FLAG).toBe(false);
+    expect(env.NEXT_PUBLIC_VALUE1).toBe(undefined);
+  });
+
+  it("should fail if flag is set and env is not provided", () => {
+    expect(() =>
+      createEnv({
+        isServer: true,
+        server: {
+          FLAG: z
+            .enum(["true", "false"])
+            .default("false")
+            .transform((v) => v === "true"),
+          VALUE: z.string().optional(),
+        },
+        // @ts-expect-error
+        runtimeEnv: {
+          FLAG: "true",
+        },
+        featureFlags: {
+          FLAG: { VALUE: true },
+        },
+      })
+    ).toThrowError("Invalid feature flags");
   });
 
   describe.skip("types", () => {
