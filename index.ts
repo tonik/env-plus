@@ -425,10 +425,10 @@ export function createEnv<
       throw new Error("Invalid environment variables");
     });
 
-  const onFlagError = (errors: ZodCustomIssue[]) => {
+  const onFlagError = (errors: ZodError[]) => {
     console.error(
-      "❌ Invalid feature flags:",
-      errors.map((e) => ({ ...e.params, message: e.message }))
+      "❌ Invalid feature flags deps:",
+      errors.reduce((acc, e) => ({ ...acc, ...e.flatten().fieldErrors }), {})
     );
     throw new Error("Invalid feature flags");
   };
@@ -456,9 +456,11 @@ export function createEnv<
   }
 
   if (opts.featureFlags) {
-    const featureFlagsSchema = z.union(
-      Object.entries(opts.featureFlags).map(([flag, def]) => {
-        return z.discriminatedUnion(flag, [
+    const featureFlagsSafeParse = (featureFlags: {}, data: unknown) => {
+      let success = true;
+      let errors: ZodError[] = [];
+      Object.entries(featureFlags).forEach(([flag, def]) => {
+        const schema = z.discriminatedUnion(flag, [
           z.object({
             [flag]: z.literal(true),
             ...Object.keys(def as {}).reduce(
@@ -476,21 +478,25 @@ export function createEnv<
           z.object({
             [flag]: z.literal(false),
           }),
+          z.object({
+            [flag]: z.undefined(),
+          }),
         ]);
-      }) as any
-    );
 
-    const flagsParse = featureFlagsSchema.safeParse(data);
+        const parsed = schema.safeParse(data);
+        if (!parsed.success) {
+          success = false;
+          errors.push(parsed.error);
+        }
+      });
+
+      return { success, errors };
+    };
+
+    const flagsParse = featureFlagsSafeParse(opts.featureFlags, data);
 
     if (!flagsParse.success) {
-      const issues = flagsParse.error.errors.flatMap((x) =>
-        x.code === "invalid_union"
-          ? x.unionErrors.flatMap((xx) =>
-              xx.issues.filter((xxx) => xxx.code === "custom")
-            )
-          : []
-      );
-      onFlagError(issues as ZodCustomIssue[]);
+      onFlagError(flagsParse.errors);
     }
   }
 

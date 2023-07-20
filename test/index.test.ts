@@ -222,8 +222,8 @@ describe("createEnv", () => {
         FLAG: undefined,
         VALUE1: undefined,
         VALUE2: undefined,
-        NEXT_PUBLIC_FLAG: undefined,
-        NEXT_PUBLIC_VALUE1: undefined,
+        NEXT_PUBLIC_FLAG: "false",
+        NEXT_PUBLIC_VALUE1: "TEST",
       },
       featureFlags: {
         FLAG: { VALUE1: true, VALUE2: true },
@@ -234,7 +234,7 @@ describe("createEnv", () => {
     });
 
     expect(env.NEXT_PUBLIC_FLAG).toBe(false);
-    expect(env.NEXT_PUBLIC_VALUE1).toBe(undefined);
+    expect(env.NEXT_PUBLIC_VALUE1).toBe("TEST");
   });
 
   it("should fail if flag is set and env is not provided", () => {
