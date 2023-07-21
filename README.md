@@ -18,6 +18,9 @@ pnpm add @tonik/env-plus zod
 ## How to define env schema
 
 ```ts
+// src/env.mjs
+// @ts-check
+
 import { createEnv } from "@tonik/env-plus";
 import { z } from "zod";
 
@@ -58,6 +61,12 @@ export const env = createEnv({
     NEXT_PUBLIC_PLASMIC_PUBLIC_KEY: z.string().min(1),
     NEXT_PUBLIC_CLIENT_ENV: z.string().min(1)
   },
+  /**
+   * Custom env transformation. Usefull when you want to apply custom
+   * logic based on shared, server, or client schema.
+   *
+   * It can define new keys that will be available for featureFlags definitions.
+   */
   transform: (env) => {
     return {
         CUSTOM_FLAG: true,
@@ -66,10 +75,10 @@ export const env = createEnv({
   },
   /**
    * Define relations between envs here.
-   * 1st level - boolean returning envs.
+   * 1st level - boolean envs.
    * 2nd level - all envs that will drop `optional` when 1st level env is set to true.
    *
-   * Only `true` as a value allows droping `optional` schema right now
+   * Only `true` as a value allows droping `optional` schema right now. Negation isn't implemented.
    */
   featureFlags: {
     CUSTOM_FLAG: {
@@ -96,9 +105,9 @@ export const env = createEnv({
 ## How to use env in the application
 
 ```ts
-import { env } from "@tonik/env-plus";
+import { env } from "./src/env.mjs";
 
-// all defined envs are typed and avalable
+// all defined envs are typed and runtime avaliable
 env.DATABASE_URL; // type string
 env.CUSTOM_FLAG; // type boolean
 env.SOME_DYNAMIC_VALUE; // type string
@@ -109,6 +118,18 @@ env.GOOGLE_CLIENT_SECRET; // type string | undefined
 if (env.GOOGLE_AUTH_ENABLED) {
   env.GOOGLE_CLIENT_ID; // type string (undefined dropped)
   env.GOOGLE_CLIENT_SECRET; // type string (undefined dropped)
+}
+```
+
+Enable type-checking by including `env.mjs` file in your tsconfig.json and turning on `allowJs` flag
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "allowJs": true
+  },
+  "include": ["src/env.mjs"]
 }
 ```
 
