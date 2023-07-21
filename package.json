@@ -2,6 +2,10 @@
   "name": "@tonik/env-plus",
   "version": "0.1.7",
   "description": "Environment variables toolkit for node applications",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tonik/env-plus"
+  },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
