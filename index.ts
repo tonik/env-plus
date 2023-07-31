@@ -463,17 +463,20 @@ export function createEnv<
         const schema = z.discriminatedUnion(flag, [
           z.object({
             [flag]: z.literal(true),
-            ...Object.keys(def as {}).reduce(
-              (acc, env) => ({
+            ...Object.keys(def as {}).reduce((acc, env) => {
+              if (!isServer && !env.startsWith(opts.clientPrefix ?? "")) {
+                return acc;
+              }
+
+              return {
                 ...acc,
                 [env]: z.custom((val) => val !== undefined, {
                   message: `Expected non undefined value, received undefined`,
                   params: { env, flag },
                   fatal: true,
                 }),
-              }),
-              {}
-            ),
+              };
+            }, {}),
           }),
           z.object({
             [flag]: z.literal(false),

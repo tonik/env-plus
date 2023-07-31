@@ -156,7 +156,6 @@ describe("createEnv", () => {
 
   it("should pass with everything set and only default values on server", () => {
     const env = createEnv({
-      isServer: true,
       server: {
         FLAG: z
           .enum(["true", "false"])
@@ -259,6 +258,78 @@ describe("createEnv", () => {
     ).toThrowError("Invalid feature flags");
   });
 
+  it.each([
+    ["server", { isServer: true }],
+    ["client", { isServer: false }],
+  ])("should support passing feature flags on %s", (_, props) => {
+    const env = createEnv({
+      clientPrefix: "PREFIX_" as const,
+      client: {
+        PREFIX_FLAG: z
+          .enum(["true", "false"])
+          .default("false")
+          .transform((v) => v === "true"),
+        PREFIX_TEST2: z.string().optional(),
+      },
+      server: {
+        FLAG: z
+          .enum(["true", "false"])
+          .default("false")
+          .transform((v) => v === "true"),
+
+        FLAG_VALUE: z
+          .string()
+          .transform((v) => parseInt(v))
+          .optional(),
+
+        FLAG_VALUE2: z.string().optional(),
+
+        REGULAR_VALUE: z.string().optional(),
+      },
+      runtimeEnv: {
+        PREFIX_FLAG: "true",
+        PREFIX_TEST2: "TEST",
+        FLAG: "true",
+        FLAG_VALUE: "1",
+        FLAG_VALUE2: "TEST@",
+        REGULAR_VALUE: "TEST",
+      },
+      featureFlags: {
+        PREFIX_FLAG: { PREFIX_TEST2: true, REGULAR_VALUE: true },
+        FLAG: { FLAG_VALUE: true, FLAG_VALUE2: true },
+      },
+      ...props,
+    });
+
+    if (props.isServer) {
+      const noError = env.REGULAR_VALUE;
+      const noError2: number | undefined = env.FLAG_VALUE;
+
+      if (env.FLAG) {
+        const expectNoError: number = env.FLAG_VALUE;
+        const expectNoError2: string = env.FLAG_VALUE2;
+      } else {
+        // @ts-expect-error
+        const nonExisting: string = env.FLAG_VALUE;
+        // @ts-expect-error
+        const nonExisting2: string = env.FLAG_VALUE2;
+      }
+    }
+
+    if (env.PREFIX_FLAG) {
+      const expectNoError: string = env.PREFIX_TEST2;
+      expect(expectNoError).toBe("TEST");
+
+      if (props.isServer) {
+        const expectNoError2: string = env.REGULAR_VALUE;
+        expect(expectNoError2).toBe(props.isServer ? "TEST" : undefined);
+      }
+    } else {
+      // @ts-expect-error
+      const nonExisting: string = env.PREFIX_TEST2;
+    }
+  });
+
   describe.skip("types", () => {
     it("should fail when runtimeEnv doesn't contain shared keys", () => {
       createEnv({
@@ -295,69 +366,6 @@ describe("createEnv", () => {
           PREFIX_TEST: "",
         },
       });
-    });
-
-    it("should support passing feature flags", () => {
-      const env = createEnv({
-        isServer: true,
-        clientPrefix: "PREFIX_" as const,
-        client: {
-          PREFIX_FLAG: z
-            .enum(["true", "false"])
-            .default("false")
-            .transform((v) => v === "true"),
-          PREFIX_TEST2: z.string().optional(),
-        },
-        server: {
-          FLAG: z
-            .enum(["true", "false"])
-            .default("false")
-            .transform((v) => v === "true"),
-
-          FLAG_VALUE: z
-            .string()
-            .transform((v) => parseInt(v))
-            .optional(),
-
-          FLAG_VALUE2: z.string().optional(),
-
-          REGULAR_VALUE: z.string().optional(),
-        },
-        runtimeEnv: {
-          PREFIX_FLAG: "TEST",
-          PREFIX_TEST2: "TEST",
-          FLAG: "true",
-          FLAG_VALUE: "1",
-          FLAG_VALUE2: "TEST@",
-          REGULAR_VALUE: "TEST",
-        },
-        featureFlags: {
-          PREFIX_FLAG: { PREFIX_TEST2: true },
-          FLAG: { FLAG_VALUE: true, FLAG_VALUE2: true },
-        },
-      });
-
-      const noError = env.REGULAR_VALUE;
-      const noError2: number | undefined = env.FLAG_VALUE;
-
-      if (env.PREFIX_FLAG) {
-        const expectNoError: string = env.PREFIX_TEST2;
-
-        expect(expectNoError).toBe("TEST");
-      } else {
-        // @ts-expect-error
-        const nonExisting: string = env.PREFIX_TEST2;
-      }
-
-      if (env.FLAG) {
-        const expectNoError: number = env.FLAG_VALUE;
-        const expectNoError2: string = env.FLAG_VALUE2;
-      } else {
-        // @ts-expect-error
-        const nonExisting: string = env.FLAG_VALUE;
-        // @ts-expect-error
-        const nonExisting2: string = env.FLAG_VALUE2;
-      }
     });
   });
 });
