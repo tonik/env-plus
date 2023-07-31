@@ -1,5 +1,12 @@
 
 
+## [0.1.9](https://github.com/tonik/env-plus/compare/0.1.8...0.1.9) (2023-07-31)
+
+
+### Bug Fixes
+
+* failin client flag access with server def ([926cca6](https://github.com/tonik/env-plus/commit/926cca68c2db99ac2e0b1a7f8db4b38125843f53))
+
 ## [0.1.8](https://github.com/tonik/env-plus/compare/0.1.7...0.1.8) (2023-07-21)
 
 ## [0.1.7](https://github.com/tonik/env-plus/compare/0.1.6...0.1.7) (2023-07-21)
