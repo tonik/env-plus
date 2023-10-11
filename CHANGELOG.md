@@ -1,5 +1,12 @@
 
 
+## [0.1.10](https://github.com/tonik/env-plus/compare/0.1.9...0.1.10) (2023-10-11)
+
+
+### Bug Fixes
+
+* missing shared envs in transform function ([ef1b130](https://github.com/tonik/env-plus/commit/ef1b130f821263cc04959cefeb7eb5a4f018735d))
+
 ## [0.1.9](https://github.com/tonik/env-plus/compare/0.1.8...0.1.9) (2023-07-31)
 
 
