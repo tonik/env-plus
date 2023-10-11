@@ -25,6 +25,8 @@ jobs:
         run: pnpm install
       - name: Run tests
         run: pnpm test
+      - name: Type check
+        run: pnpm type-check
 
   publish-npm:
     needs: build

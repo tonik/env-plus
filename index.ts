@@ -40,12 +40,17 @@ type ServerOptions<
 };
 
 type TransformOptions<
+  TShared extends Record<string, ZodType>,
   TClient extends Record<string, ZodType>,
   TServer extends Record<string, ZodType>,
   TTransformOutput extends Record<string, unknown>
 > = {
   transform: (
-    envs: Simplify<z.infer<ZodObject<TClient>> & z.infer<ZodObject<TServer>>>
+    envs: Simplify<
+      z.infer<ZodObject<TShared>> &
+        z.infer<ZodObject<TClient>> &
+        z.infer<ZodObject<TServer>>
+    >
   ) => TTransformOutput;
 };
 
@@ -282,7 +287,7 @@ type EnvOptions<
 > = (
   | (ClientOptions<TPrefix, TClient> &
       ServerOptions<TPrefix, TServer> &
-      TransformOptions<TClient, TServer, TTransformOutput> &
+      TransformOptions<TShared, TClient, TServer, TTransformOutput> &
       FeatureFlagsOptions<
         TShared,
         TClient,
@@ -292,11 +297,11 @@ type EnvOptions<
       >)
   | (ClientOptions<TPrefix, TClient> &
       ServerOptions<TPrefix, TServer> &
-      TransformOptions<TClient, TServer, TTransformOutput> &
+      TransformOptions<TShared, TClient, TServer, TTransformOutput> &
       Impossible<FeatureFlagsOptions<never, never, never, never, never>>)
   | (ClientOptions<TPrefix, TClient> &
       ServerOptions<TPrefix, TServer> &
-      Impossible<TransformOptions<never, never, never>> &
+      Impossible<TransformOptions<never, never, never, never>> &
       FeatureFlagsOptions<
         TShared,
         TClient,
@@ -306,7 +311,7 @@ type EnvOptions<
       >)
   | (ClientOptions<TPrefix, TClient> &
       Impossible<ServerOptions<never, never>> &
-      TransformOptions<TClient, TServer, TTransformOutput> &
+      TransformOptions<TShared, TClient, TServer, TTransformOutput> &
       FeatureFlagsOptions<
         TShared,
         TClient,
@@ -316,7 +321,7 @@ type EnvOptions<
       >)
   | (Impossible<ClientOptions<never, never>> &
       ServerOptions<TPrefix, TServer> &
-      TransformOptions<TClient, TServer, TTransformOutput> &
+      TransformOptions<TShared, TClient, TServer, TTransformOutput> &
       FeatureFlagsOptions<
         TShared,
         TClient,
@@ -326,19 +331,19 @@ type EnvOptions<
       >)
   | (ClientOptions<TPrefix, TClient> &
       ServerOptions<TPrefix, TServer> &
-      Impossible<TransformOptions<never, never, never>> &
+      Impossible<TransformOptions<never, never, never, never>> &
       Impossible<FeatureFlagsOptions<never, never, never, never, never>>)
   | (ClientOptions<TPrefix, TClient> &
       Impossible<ServerOptions<never, never>> &
-      TransformOptions<TClient, TServer, TTransformOutput> &
+      TransformOptions<TShared, TClient, TServer, TTransformOutput> &
       Impossible<FeatureFlagsOptions<never, never, never, never, never>>)
   | (Impossible<ClientOptions<never, never>> &
       ServerOptions<TPrefix, TServer> &
-      TransformOptions<TClient, TServer, TTransformOutput> &
+      TransformOptions<TShared, TClient, TServer, TTransformOutput> &
       Impossible<FeatureFlagsOptions<never, never, never, never, never>>)
   | (ClientOptions<TPrefix, TClient> &
       Impossible<ServerOptions<never, never>> &
-      Impossible<TransformOptions<never, never, never>> &
+      Impossible<TransformOptions<never, never, never, never>> &
       FeatureFlagsOptions<
         TShared,
         TClient,
@@ -348,7 +353,7 @@ type EnvOptions<
       >)
   | (Impossible<ClientOptions<never, never>> &
       ServerOptions<TPrefix, TServer> &
-      Impossible<TransformOptions<never, never, never>> &
+      Impossible<TransformOptions<never, never, never, never>> &
       FeatureFlagsOptions<
         TShared,
         TClient,
@@ -358,11 +363,11 @@ type EnvOptions<
       >)
   | (ClientOptions<TPrefix, TClient> &
       Impossible<ServerOptions<never, never>> &
-      Impossible<TransformOptions<never, never, never>> &
+      Impossible<TransformOptions<never, never, never, never>> &
       Impossible<FeatureFlagsOptions<never, never, never, never, never>>)
   | (ServerOptions<TPrefix, TServer> &
       Impossible<ClientOptions<never, never>> &
-      Impossible<TransformOptions<never, never, never>> &
+      Impossible<TransformOptions<never, never, never, never>> &
       Impossible<FeatureFlagsOptions<never, never, never, never, never>>)
 ) &
   RuntimeOptions<TPrefix, TShared, TClient, TServer> &

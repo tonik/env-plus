@@ -26,6 +26,7 @@
   "scripts": {
     "build": "tsup index.ts",
     "test": "vitest",
+    "type-check": "tsc --noEmit",
     "release": "release-it"
   },
   "peerDependencies": {

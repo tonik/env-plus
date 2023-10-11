@@ -330,6 +330,34 @@ describe("createEnv", () => {
     }
   });
 
+  it("should pass all envs to transform function", () => {
+    const result = createEnv({
+      isServer: true,
+      server: {
+        VALUE: z.string(),
+      },
+      client: {
+        PREFIX_VALUE: z.string(),
+      },
+      shared: {
+        SHARED_VALUE: z.string(),
+      },
+      transform: (env) => {
+        return {
+          TRANSFORM_VALUE: env.VALUE + env.PREFIX_VALUE + env.SHARED_VALUE,
+        };
+      },
+      clientPrefix: "PREFIX_" as const,
+      runtimeEnv: {
+        VALUE: "1",
+        PREFIX_VALUE: "2",
+        SHARED_VALUE: "3",
+      },
+    });
+
+    expect(result.TRANSFORM_VALUE).toEqual("123");
+  });
+
   describe.skip("types", () => {
     it("should fail when runtimeEnv doesn't contain shared keys", () => {
       createEnv({
